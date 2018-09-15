@@ -22,18 +22,17 @@ void Manager::setConfigName(const QString &configName)
 void Manager::timerEvent(QTimerEvent */*event*/)
 {
   if (schedule_.isActive()) {
-    const auto time = QTime(0, 0, 0).addSecs(schedule_.breakLeft().count());
+    const auto time = QTime(0, 0, 0).addSecs(schedule_.breakLeft());
     const auto text = time.toString();
     overlay_.ensureVisible(text);
   }
   else {
     overlay_.ensureHidden();
 
-    QStringList toolTip;
-    const auto now = std::chrono::system_clock::now();
+    QStringList toolTip{tr("Time till break:")};
+    const auto now = QDateTime::currentDateTime();
     for (const auto &b: schedule_.breaks())
-      toolTip << QTime(0, 0, 0).addSecs(
-        std::chrono::duration_cast<std::chrono::seconds>(b.time - now).count()).toString();
+      toolTip << QTime(0, 0, 0).addSecs(now.secsTo(b.time) + 1).toString();
     tray_.setToolTip(toolTip.join(QLatin1Char('\n')));
   }
 }
@@ -54,13 +53,12 @@ void Manager::readConfig()
     const auto parts = line.split(' ');
     if (parts.size() > 1) {
       Break breakInfo;
-      breakInfo.interval = std::chrono::seconds(parts[0].toInt());
-      breakInfo.duration = std::chrono::seconds(parts[1].toInt());
+      breakInfo.interval = Seconds(parts[0].toInt());
+      breakInfo.duration = Seconds(parts[1].toInt());
       qDebug() << "Read break with interval(duration)"
-               << breakInfo.interval.count() << breakInfo.duration.count();
-      if (breakInfo.interval == std::chrono::seconds::zero()
-          || breakInfo.duration == std::chrono::seconds::zero()) {
-        qWarning() << "Zero values found in break. Ignoring.";
+               << breakInfo.interval << breakInfo.duration;
+      if (breakInfo.interval <= 0 || breakInfo.duration <= 0) {
+        qWarning() << "Not positive values found in break. Ignoring.";
         continue;
       }
       schedule_.add(breakInfo);

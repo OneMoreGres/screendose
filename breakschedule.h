@@ -1,13 +1,20 @@
 #pragma once
 
-#include <vector>
-#include <chrono>
+#include <QDateTime>
+#include <QVector>
+
+struct Seconds
+{
+  explicit Seconds(qint64 value = 0) : value(value) {}
+  operator qint64() {return value;}
+  qint64 value;
+};
 
 struct Break
 {
-  std::chrono::seconds interval;
-  std::chrono::seconds duration;
-  std::chrono::system_clock::time_point time;
+  Seconds interval;
+  Seconds duration;
+  QDateTime time;
 };
 
 class BreakSchedule
@@ -17,17 +24,17 @@ public:
 
   bool isActive();
   void add(Break breakInfo);
-  std::chrono::seconds breakLeft() const;
+  Seconds breakLeft() const;
   void skip();
 
-  const std::vector<Break> &breaks() const;
+  const QVector<Break> &breaks() const;
 
 private:
   bool isActive(const Break &breakInfo) const;
   void updateNext();
   void updateBreaks();
 
-  std::vector<Break> breaks_;
-  std::chrono::system_clock::time_point origin_;
+  QVector<Break> breaks_;
+  QDateTime origin_;
   const Break *nextBreak_;
 };

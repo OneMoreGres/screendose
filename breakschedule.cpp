@@ -5,7 +5,7 @@
 using namespace std;
 
 BreakSchedule::BreakSchedule() :
-  origin_(chrono::system_clock::now()),
+  origin_(QDateTime::currentDateTime()),
   nextBreak_(nullptr)
 {
 }
@@ -26,43 +26,44 @@ bool BreakSchedule::isActive()
 
 void BreakSchedule::add(Break breakInfo)
 {
-  breakInfo.time = origin_ + breakInfo.interval;
+  breakInfo.time = origin_.addSecs(breakInfo.interval);
   breaks_.push_back(breakInfo);
   updateNext();
 }
 
-chrono::seconds BreakSchedule::breakLeft() const
+Seconds BreakSchedule::breakLeft() const
 {
   Q_ASSERT(nextBreak_);
-  const auto elapsed = chrono::system_clock::now() - nextBreak_->time;
-  return nextBreak_->duration - chrono::duration_cast<chrono::seconds>(elapsed);
+  const auto elapsed = nextBreak_->time.secsTo(QDateTime::currentDateTime());
+  return Seconds(nextBreak_->duration.value - elapsed);
 }
 
 void BreakSchedule::skip()
 {
-  const auto now = chrono::system_clock::now();
+  const auto now = QDateTime::currentDateTime();
   for (auto &b: breaks_) {
     if (isActive(b))
-      b.time = now + b.interval;
+      b.time = now.addSecs(b.interval);
   }
+  updateNext();
 }
 
 bool BreakSchedule::isActive(const Break &breakInfo) const
 {
-  const auto now = chrono::system_clock::now();
+  const auto now = QDateTime::currentDateTime();
   return breakInfo.time <= now;
 }
 
 void BreakSchedule::updateBreaks()
 {
-  const auto now = chrono::system_clock::now();
+  const auto now = QDateTime::currentDateTime();
   for (auto &b: breaks_) {
-    while (b.time <= now - b.duration)
-      b.time += b.duration + b.interval;
+    while (b.time.addSecs(b.duration) <= now)
+      b.time = b.time.addSecs(b.duration + b.interval);
   }
 }
 
-const std::vector<Break> &BreakSchedule::breaks() const
+const QVector<Break> &BreakSchedule::breaks() const
 {
   return breaks_;
 }
