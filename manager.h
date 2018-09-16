@@ -9,18 +9,17 @@
 class Manager : public QObject
 {
 public:
-  Manager();
+  explicit Manager(const QString &configName);
 
-  void setConfigName(const QString &configName);
   bool eventFilter(QObject *watched, QEvent *event) override;
 
 protected:
   void timerEvent(QTimerEvent *event) override;
 
 private:
-  void readConfig();
+  void readConfig(const QString &configName);
 
-  QString configName_;
+  Seconds warnBefore_;
   BreakSchedule schedule_;
   DesktopOverlay overlay_;
   Tray tray_;

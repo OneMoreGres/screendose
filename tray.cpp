@@ -22,4 +22,9 @@ void Tray::setToolTip(const QString &text)
   icon_->setToolTip(text);
 }
 
+void Tray::showMessage(const QString &text)
+{
+  icon_->showMessage(QCoreApplication::applicationName(), text);
+}
+
 Tray::~Tray() = default;

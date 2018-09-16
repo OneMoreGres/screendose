@@ -11,6 +11,7 @@ public:
   ~Tray() final;
 
   void setToolTip(const QString &text);
+  void showMessage(const QString &text);
 
 private:
   std::unique_ptr<QMenu> menu_;

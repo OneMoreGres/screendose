@@ -3,20 +3,21 @@
 #include <QFile>
 #include <QKeyEvent>
 #include <QTime>
+#include <QCoreApplication>
 #include <QDebug>
 
-Manager::Manager() :
-  configName_("settings.ini")
+Manager::Manager(const QString &configName) :
+  warnBefore_(-1)
 {
-  readConfig();
+  readConfig(configName);
+
   overlay_.setEventFilter(*this);
 
+  if (schedule_.breaks().isEmpty()) {
+    qCritical() << "no breaks set. exiting";
+    QCoreApplication::exit(1);
+  }
   startTimer(1000);
-}
-
-void Manager::setConfigName(const QString &configName)
-{
-  configName_ = configName;
 }
 
 void Manager::timerEvent(QTimerEvent */*event*/)
@@ -31,15 +32,24 @@ void Manager::timerEvent(QTimerEvent */*event*/)
 
     QStringList toolTip{tr("Time till break:")};
     const auto now = QDateTime::currentDateTime();
-    for (const auto &b: schedule_.breaks())
-      toolTip << QTime(0, 0, 0).addSecs(now.secsTo(b.time) + 1).toString();
+    const auto &breaks = schedule_.breaks();
+
+    auto toNearest = std::numeric_limits<qint64>::max();
+    for (const auto &b: breaks) {
+      const auto toBreak = now.secsTo(b.time) + 1;
+      toolTip << QTime(0, 0, 0).addSecs(toBreak).toString();
+      toNearest = std::min(toBreak, toNearest);
+    }
     tray_.setToolTip(toolTip.join(QLatin1Char('\n')));
+
+    if (toNearest == warnBefore_)
+      tray_.showMessage(tr("Break in %1 seconds").arg(toNearest));
   }
 }
 
-void Manager::readConfig()
+void Manager::readConfig(const QString &configName)
 {
-  QFile f(configName_);
+  QFile f(configName);
   if (!f.open(QFile::ReadOnly)) {
     qCritical() << "failed to open config file" << f.fileName()
                 << "No breaks added";
@@ -51,17 +61,26 @@ void Manager::readConfig()
     if (line.startsWith('#'))
       continue;
     const auto parts = line.split(' ');
-    if (parts.size() > 1) {
-      Break breakInfo;
-      breakInfo.interval = Seconds(parts[0].toInt());
-      breakInfo.duration = Seconds(parts[1].toInt());
-      qDebug() << "Read break with interval(duration)"
-               << breakInfo.interval << breakInfo.duration;
-      if (breakInfo.interval <= 0 || breakInfo.duration <= 0) {
-        qWarning() << "Not positive values found in break. Ignoring.";
-        continue;
+    if (parts.size() < 2)
+      continue;
+
+    const auto name = parts[0];
+    if (name == QStringLiteral("break")) {
+      if (parts.size() > 2) {
+        Break breakInfo;
+        breakInfo.interval = Seconds(parts[1].toInt());
+        breakInfo.duration = Seconds(parts[2].toInt());
+        qDebug() << "Read break with interval(duration)"
+                 << breakInfo.interval << breakInfo.duration;
+        if (breakInfo.interval <= 0 || breakInfo.duration <= 0) {
+          qWarning() << "Not positive values found in break. Ignoring.";
+          continue;
+        }
+        schedule_.add(breakInfo);
       }
-      schedule_.add(breakInfo);
+    }
+    else if (name == "warn_before") {
+      warnBefore_ = Seconds(parts[1].toInt());
     }
   }
 }
