@@ -8,6 +8,8 @@
 
 #include <memory>
 
+class QAction;
+
 class Manager : public QObject
 {
 public:
@@ -28,4 +30,5 @@ private:
   DesktopOverlay overlay_;
   std::unique_ptr<QMenu> trayMenu_;
   std::unique_ptr<QSystemTrayIcon> tray_;
+  QAction *pauseAction_;
 };

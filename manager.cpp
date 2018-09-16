@@ -10,7 +10,8 @@
 Manager::Manager(const QString &configName) :
   warnBefore_(-1),
   trayMenu_(new QMenu),
-  tray_(new QSystemTrayIcon)
+  tray_(new QSystemTrayIcon),
+  pauseAction_(nullptr)
 {
   readConfig(configName);
 
@@ -29,6 +30,13 @@ Manager::~Manager() = default;
 
 void Manager::timerEvent(QTimerEvent */*event*/)
 {
+  Q_ASSERT(pauseAction_);
+  if (pauseAction_->isChecked()) {
+    overlay_.ensureHidden();
+    tray_->setToolTip({});
+    return;
+  }
+
   if (schedule_.isActive()) {
     const auto time = QTime(0, 0, 0).addSecs(schedule_.breakLeft());
     const auto text = time.toString();
@@ -95,7 +103,10 @@ void Manager::readConfig(const QString &configName)
 
 void Manager::setupTray()
 {
-  auto close = trayMenu_->addAction("Exit");
+  pauseAction_ = trayMenu_->addAction(tr("Pause"));
+  pauseAction_->setCheckable(true);
+
+  auto close = trayMenu_->addAction(tr("Exit"));
   connect(close, &QAction::triggered,
           this, [] {QCoreApplication::quit();});
 
