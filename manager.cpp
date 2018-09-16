@@ -72,6 +72,21 @@ void Manager::readConfig(const QString &configName)
     return;
   }
 
+
+  auto parseDt = [](const QString &in) {
+                   auto parts = in.split(':');
+                   auto result = 0;
+                   if (!parts.isEmpty()) {
+                     if (parts.size() == 1) {
+                       result = parts[0].toInt();
+                     }
+                     else {
+                       result = parts[0].toInt() * 60 + parts[1].toInt();
+                     }
+                   }
+                   return Seconds(result);
+                 };
+
   while (!f.atEnd()) {
     const auto line = f.readLine().trimmed();
     if (line.startsWith('#'))
@@ -84,8 +99,8 @@ void Manager::readConfig(const QString &configName)
     if (name == QStringLiteral("break")) {
       if (parts.size() > 2) {
         Break breakInfo;
-        breakInfo.interval = Seconds(parts[1].toInt());
-        breakInfo.duration = Seconds(parts[2].toInt());
+        breakInfo.interval = Seconds(parseDt(parts[1]));
+        breakInfo.duration = Seconds(parseDt(parts[2]));
         qDebug() << "Read break with interval(duration)"
                  << breakInfo.interval << breakInfo.duration;
         if (breakInfo.interval <= 0 || breakInfo.duration <= 0) {
