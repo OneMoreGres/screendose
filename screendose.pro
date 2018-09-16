@@ -27,15 +27,13 @@ SOURCES += \
     manager.cpp \
     desktopoverlay.cpp \
     screenoverlay.cpp \
-    breakschedule.cpp \
-    tray.cpp
+    breakschedule.cpp
 
 HEADERS += \
     manager.h \
     desktopoverlay.h \
     screenoverlay.h \
-    breakschedule.h \
-    tray.h
+    breakschedule.h
 
 OTHER_FILES += uncrustify.cfg
 

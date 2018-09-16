@@ -4,21 +4,28 @@
 #include <QKeyEvent>
 #include <QTime>
 #include <QCoreApplication>
+#include <QMenu>
 #include <QDebug>
 
 Manager::Manager(const QString &configName) :
-  warnBefore_(-1)
+  warnBefore_(-1),
+  trayMenu_(new QMenu),
+  tray_(new QSystemTrayIcon)
 {
   readConfig(configName);
-
-  overlay_.setEventFilter(*this);
 
   if (schedule_.breaks().isEmpty()) {
     qCritical() << "no breaks set. exiting";
     QCoreApplication::exit(1);
   }
+
+  overlay_.setEventFilter(*this);
+  setupTray();
+
   startTimer(1000);
 }
+
+Manager::~Manager() = default;
 
 void Manager::timerEvent(QTimerEvent */*event*/)
 {
@@ -40,10 +47,11 @@ void Manager::timerEvent(QTimerEvent */*event*/)
       toolTip << QTime(0, 0, 0).addSecs(toBreak).toString();
       toNearest = std::min(toBreak, toNearest);
     }
-    tray_.setToolTip(toolTip.join(QLatin1Char('\n')));
+    tray_->setToolTip(toolTip.join(QLatin1Char('\n')));
 
     if (toNearest == warnBefore_)
-      tray_.showMessage(tr("Break in %1 seconds").arg(toNearest));
+      tray_->showMessage(QCoreApplication::applicationName(),
+                         tr("Break in %1 seconds").arg(toNearest));
   }
 }
 
@@ -83,6 +91,18 @@ void Manager::readConfig(const QString &configName)
       warnBefore_ = Seconds(parts[1].toInt());
     }
   }
+}
+
+void Manager::setupTray()
+{
+  auto close = trayMenu_->addAction("Exit");
+  connect(close, &QAction::triggered,
+          this, [] {QCoreApplication::quit();});
+
+  tray_->setContextMenu(trayMenu_.get());
+
+  tray_->setIcon(QIcon(":/icon.png"));
+  tray_->show();
 }
 
 bool Manager::eventFilter(QObject */*watched*/, QEvent *event)
