@@ -5,8 +5,8 @@
 
 struct Seconds
 {
-  explicit Seconds(qint64 value = 0) : value(value) {}
-  operator qint64() {return value;}
+  constexpr explicit Seconds(qint64 value = 0) : value(value) {}
+  constexpr operator qint64() const {return value;}
   qint64 value;
 };
 

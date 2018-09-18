@@ -7,6 +7,11 @@
 #include <QMenu>
 #include <QDebug>
 
+QString toString(qint64 seconds)
+{
+  return QTime(0, 0, 0).addSecs(int(seconds)).toString();
+}
+
 Manager::Manager(const QString &configName) :
   warnBefore_(-1),
   trayMenu_(new QMenu),
@@ -38,9 +43,7 @@ void Manager::timerEvent(QTimerEvent */*event*/)
   }
 
   if (schedule_.isActive()) {
-    const auto time = QTime(0, 0, 0).addSecs(schedule_.breakLeft());
-    const auto text = time.toString();
-    overlay_.ensureVisible(text);
+    overlay_.ensureVisible(toString(schedule_.breakLeft()));
   }
   else {
     overlay_.ensureHidden();
@@ -49,17 +52,23 @@ void Manager::timerEvent(QTimerEvent */*event*/)
     const auto now = QDateTime::currentDateTime();
     const auto &breaks = schedule_.breaks();
 
+    const Break *nearest = nullptr;
     auto toNearest = std::numeric_limits<qint64>::max();
     for (const auto &b: breaks) {
       const auto toBreak = now.secsTo(b.time) + 1;
-      toolTip << QTime(0, 0, 0).addSecs(toBreak).toString();
-      toNearest = std::min(toBreak, toNearest);
+      toolTip << toString(toBreak);
+      if (toBreak < toNearest) {
+        toNearest = toBreak;
+        nearest = &b;
+      }
     }
     tray_->setToolTip(toolTip.join(QLatin1Char('\n')));
 
-    if (toNearest == warnBefore_)
+    if (nearest && toNearest == warnBefore_) {
       tray_->showMessage(QCoreApplication::applicationName(),
-                         tr("Break in %1 seconds").arg(toNearest));
+                         tr("Break in %1 seconds for %2")
+                         .arg(toNearest).arg(toString(nearest->duration)));
+    }
   }
 }
 
@@ -122,10 +131,12 @@ void Manager::setupTray()
   auto row = 0;
   for (const auto &b: schedule_.breaks()) {
     auto action = activateMenu->addAction(
-      QTime(0, 0, 0).addSecs(b.interval.value).toString() + " - " +
-      QTime(0, 0, 0).addSecs(b.duration.value).toString());
+      toString(b.interval.value) + " - " + toString(b.duration.value));
     connect(action, &QAction::triggered,
-            this, [this, row] {schedule_.activateAt(row);});
+            this, [this, row] {
+      schedule_.activateAt(row);
+      timerEvent(nullptr);
+    });
     ++row;
   }
 
