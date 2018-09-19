@@ -38,6 +38,13 @@ Seconds BreakSchedule::breakLeft() const
   return Seconds(nextBreak_->duration.value - elapsed);
 }
 
+void BreakSchedule::activateAt(int row)
+{
+  Q_ASSERT(row > -1 && row < breaks_.size());
+  breaks_[row].time = QDateTime::currentDateTime();
+  updateNext();
+}
+
 void BreakSchedule::skip()
 {
   const auto now = QDateTime::currentDateTime();

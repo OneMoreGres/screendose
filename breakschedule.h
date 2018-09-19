@@ -25,6 +25,7 @@ public:
   bool isActive();
   void add(Break breakInfo);
   Seconds breakLeft() const;
+  void activateAt(int row);
   void skip();
 
   const QVector<Break> &breaks() const;

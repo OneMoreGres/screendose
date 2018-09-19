@@ -118,6 +118,17 @@ void Manager::readConfig(const QString &configName)
 
 void Manager::setupTray()
 {
+  auto activateMenu = trayMenu_->addMenu("Activate");
+  auto row = 0;
+  for (const auto &b: schedule_.breaks()) {
+    auto action = activateMenu->addAction(
+      QTime(0, 0, 0).addSecs(b.interval.value).toString() + " - " +
+      QTime(0, 0, 0).addSecs(b.duration.value).toString());
+    connect(action, &QAction::triggered,
+            this, [this, row] {schedule_.activateAt(row);});
+    ++row;
+  }
+
   pauseAction_ = trayMenu_->addAction(tr("Pause"));
   pauseAction_->setCheckable(true);
 
