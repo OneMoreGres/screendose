@@ -9,7 +9,20 @@
 
 QString toString(qint64 seconds)
 {
-  return QTime(0, 0, 0).addSecs(int(seconds)).toString();
+  const auto hours = seconds / 3600;
+  seconds -= hours * 3600;
+  const auto minutes = seconds / 60;
+  seconds -= minutes * 60;
+  if (hours > 0) {
+    return QString::number(hours) + QLatin1Char(':') +
+           QString::number(minutes).rightJustified(2, QLatin1Char('0')) + QLatin1Char(':') +
+           QString::number(seconds).rightJustified(2, QLatin1Char('0'));
+  }
+  if (minutes > 0) {
+    return QString::number(minutes) + QLatin1Char(':') +
+           QString::number(seconds).rightJustified(2, QLatin1Char('0'));
+  }
+  return QString::number(seconds);
 }
 
 Manager::Manager(const QString &configName) :

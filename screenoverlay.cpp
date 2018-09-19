@@ -23,6 +23,8 @@ ScreenOverlay::ScreenOverlay() :
 
   setLayout(hbox);
 
+  label_->setAlignment(Qt::AlignCenter);
+
   setStyleSheet(QStringLiteral("background-color:black; color:white; font-size: 24px;"));
 }
 
