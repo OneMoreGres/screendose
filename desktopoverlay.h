@@ -6,17 +6,16 @@
 class QString;
 class QObject;
 class ScreenOverlay;
+class Manager;
 
 class DesktopOverlay
 {
 public:
-  DesktopOverlay();
+  explicit DesktopOverlay(Manager &manager);
   ~DesktopOverlay();
 
   void ensureVisible(const QString &text);
   void ensureHidden();
-
-  void setEventFilter(QObject &filter);
 
 private:
   bool isVisible_;

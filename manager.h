@@ -16,7 +16,7 @@ public:
   explicit Manager(const QString &configName);
   ~Manager() final;
 
-  bool eventFilter(QObject *watched, QEvent *event) override;
+  void skipBreak();
 
 protected:
   void timerEvent(QTimerEvent *event) override;

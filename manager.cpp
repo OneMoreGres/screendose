@@ -1,7 +1,6 @@
 #include "manager.h"
 
 #include <QFile>
-#include <QKeyEvent>
 #include <QTime>
 #include <QCoreApplication>
 #include <QMenu>
@@ -27,6 +26,7 @@ QString toString(qint64 seconds)
 
 Manager::Manager(const QString &configName) :
   warnBefore_(-1),
+  overlay_(*this),
   trayMenu_(new QMenu),
   tray_(new QSystemTrayIcon),
   pauseAction_(nullptr)
@@ -38,10 +38,15 @@ Manager::Manager(const QString &configName) :
     QCoreApplication::exit(1);
   }
 
-  overlay_.setEventFilter(*this);
   setupTray();
 
   startTimer(1000);
+}
+
+void Manager::skipBreak()
+{
+  schedule_.skip();
+  overlay_.ensureHidden();
 }
 
 Manager::~Manager() = default;
@@ -164,16 +169,4 @@ void Manager::setupTray()
 
   tray_->setIcon(QIcon(":/icon.png"));
   tray_->show();
-}
-
-bool Manager::eventFilter(QObject */*watched*/, QEvent *event)
-{
-  if (event->type() == QEvent::KeyPress) {
-    auto casted = static_cast<QKeyEvent *>(event);
-    if (casted->key() == Qt::Key_S) {
-      schedule_.skip();
-      overlay_.ensureHidden();
-    }
-  }
-  return false;
 }

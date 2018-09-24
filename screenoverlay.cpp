@@ -1,10 +1,13 @@
 #include "screenoverlay.h"
+#include "manager.h"
 
 #include <QBoxLayout>
+#include <QPushButton>
+#include <QKeyEvent>
 
-ScreenOverlay::ScreenOverlay() :
-  label_(new QLabel(this)),
-  tips_(new QLabel(tr("S - skip"), this))
+ScreenOverlay::ScreenOverlay(Manager &manager) :
+  manager_(manager),
+  label_(new QLabel(this))
 {
   setWindowFlags(Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint |
                  Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint);
@@ -12,9 +15,13 @@ ScreenOverlay::ScreenOverlay() :
   auto vbox = new QVBoxLayout;
   auto hbox = new QHBoxLayout;
 
+  auto skip = new QPushButton(tr("S - skip"), this);
+  connect(skip, &QPushButton::pressed,
+          this, [this] {manager_.skipBreak();});
+
   vbox->addStretch(1);
   vbox->addWidget(label_);
-  vbox->addWidget(tips_);
+  vbox->addWidget(skip);
   vbox->addStretch(1);
 
   hbox->addStretch(1);
@@ -26,9 +33,21 @@ ScreenOverlay::ScreenOverlay() :
   label_->setAlignment(Qt::AlignCenter);
 
   setStyleSheet(QStringLiteral("background-color:black; color:white; font-size: 24px;"));
+
+  installEventFilter(this);
 }
 
 void ScreenOverlay::setText(const QString &text)
 {
   label_->setText(text);
+}
+
+bool ScreenOverlay::eventFilter(QObject */*watched*/, QEvent *event)
+{
+  if (event->type() == QEvent::KeyPress) {
+    auto casted = static_cast<QKeyEvent *>(event);
+    if (casted->key() == Qt::Key_S)
+      manager_.skipBreak();
+  }
+  return false;
 }

@@ -4,13 +4,13 @@
 #include <QGuiApplication>
 #include <QScreen>
 
-DesktopOverlay::DesktopOverlay() :
+DesktopOverlay::DesktopOverlay(Manager &manager) :
   isVisible_(false)
 {
   const auto screens = QGuiApplication::screens();
   screens_.reserve(screens.size());
   for (const auto &screen: screens) {
-    screens_.emplace_back(new ScreenOverlay);
+    screens_.emplace_back(new ScreenOverlay(manager));
     screens_.back()->setGeometry(screen->geometry());
   }
 }
@@ -34,10 +34,4 @@ void DesktopOverlay::ensureHidden()
   isVisible_ = false;
   for (const auto &screen: screens_)
     screen->hide();
-}
-
-void DesktopOverlay::setEventFilter(QObject &filter)
-{
-  for (auto &screen: screens_)
-    screen->installEventFilter(&filter);
 }
