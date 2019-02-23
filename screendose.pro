@@ -21,6 +21,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 CONFIG += c++11
+VERSION = 0.1.0
+DEFINES += VERSION_STRING=$$VERSION
 
 SOURCES += \
         main.cpp \
@@ -35,7 +37,8 @@ HEADERS += \
     screenoverlay.h \
     breakschedule.h
 
-OTHER_FILES += uncrustify.cfg
+OTHER_FILES += \
+    uncrustify.cfg
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
