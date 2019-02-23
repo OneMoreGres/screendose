@@ -7,6 +7,7 @@ Covers screen with black frame after some periods of time.
 ## Installing
 
 Linux: download appimage from releases page, make it executable and run
+
 Windows and OSX: not implemented (let me know if they are needed)
 
 ## Building from source

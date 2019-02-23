@@ -54,7 +54,7 @@ linux {
 
     target.path = $$PREFIX/bin
 
-    shortcuts.files = $$ROOT/share/linux/screendose.desktop
+    shortcuts.files = $$ROOT/share/screendose.desktop
     shortcuts.path = $$PREFIX/share/applications/
     pixmaps.files += $$ROOT/images/screendose.png
     pixmaps.path = $$PREFIX/share/pixmaps/
