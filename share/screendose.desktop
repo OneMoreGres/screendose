@@ -1,0 +1,9 @@
+[Desktop Entry]
+Comment=Screen time limiter tool.
+Exec=screendose
+GenericName=Screen Dose
+Icon=screendose
+Name=ScreenDose
+Terminal=false
+Type=Application
+Categories=Utility;Core;Qt;

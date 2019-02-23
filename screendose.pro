@@ -21,8 +21,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 CONFIG += c++11
-VERSION = 0.1.0
-DEFINES += VERSION_STRING=$$VERSION
+
+ROOT = $$PWD
+APP_VERSION = "$$cat($$ROOT/version)"
+DEFINES += VERSION_STRING=$$APP_VERSION
+
+QMAKE_TARGET_COMPANY = Gres
+QMAKE_TARGET_PRODUCT = ScreenDose
+QMAKE_TARGET_COPYRIGHT = Copyright (c) Gres
+VERSION = $$APP_VERSION.0
+
 
 SOURCES += \
     src/main.cpp \
@@ -40,10 +48,19 @@ HEADERS += \
 OTHER_FILES += \
     share/*
 
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
+
+linux {
+    PREFIX = /usr
+
+    target.path = $$PREFIX/bin
+
+    shortcuts.files = $$ROOT/share/linux/screendose.desktop
+    shortcuts.path = $$PREFIX/share/applications/
+    pixmaps.files += $$ROOT/images/screendose.png
+    pixmaps.path = $$PREFIX/share/pixmaps/
+
+    INSTALLS += target shortcuts pixmaps
+}
 
 RESOURCES += \
     resources.qrc
