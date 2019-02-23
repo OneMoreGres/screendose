@@ -25,20 +25,20 @@ VERSION = 0.1.0
 DEFINES += VERSION_STRING=$$VERSION
 
 SOURCES += \
-        main.cpp \
-    manager.cpp \
-    desktopoverlay.cpp \
-    screenoverlay.cpp \
-    breakschedule.cpp
+    src/main.cpp \
+    src/manager.cpp \
+    src/desktopoverlay.cpp \
+    src/screenoverlay.cpp \
+    src/breakschedule.cpp
 
 HEADERS += \
-    manager.h \
-    desktopoverlay.h \
-    screenoverlay.h \
-    breakschedule.h
+    src/manager.h \
+    src/desktopoverlay.h \
+    src/screenoverlay.h \
+    src/breakschedule.h
 
 OTHER_FILES += \
-    uncrustify.cfg
+    share/*
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
