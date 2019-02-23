@@ -2,6 +2,8 @@
 
 Covers screen with black frame after some periods of time.
 
+![Screenshot](images/screenshot.png)
+
 ## Installing
 
 Linux: download appimage from releases page, make it executable and run
