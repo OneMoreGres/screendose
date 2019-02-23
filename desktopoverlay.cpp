@@ -19,12 +19,14 @@ DesktopOverlay::~DesktopOverlay() = default;
 
 void DesktopOverlay::ensureVisible(const QString &text)
 {
-  isVisible_ = true;
   for (const auto &screen: screens_) {
-    screen->show();
-    screen->grabKeyboard();
+    if (!screen->isVisible()) {
+      screen->show();
+      screen->activateWindow();
+    }
     screen->setText(text);
   }
+  isVisible_ = true;
 }
 
 void DesktopOverlay::ensureHidden()
