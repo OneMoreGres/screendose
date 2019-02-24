@@ -46,7 +46,8 @@ HEADERS += \
     src/breakschedule.h
 
 OTHER_FILES += \
-    share/*
+    share/* \
+    version
 
 
 linux {

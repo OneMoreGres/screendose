@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file alias="icon.png">images/icon.png</file>
+        <file alias="settings.ini">share/settings.ini</file>
     </qresource>
 </RCC>

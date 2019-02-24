@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
   QCoreApplication::setApplicationName(QStringLiteral("Screen Dose"));
   QCoreApplication::setApplicationVersion(STR(VERSION_STRING));
 
-  QString configName = QStringLiteral("settings.ini");
+  QString configName = QStringLiteral(":/settings.ini");
   {
     QCommandLineParser parser;
     parser.setApplicationDescription(QStringLiteral("Screen time limiter tool"));

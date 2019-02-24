@@ -36,6 +36,7 @@ Manager::Manager(const QString &configName) :
   if (schedule_.breaks().isEmpty()) {
     qCritical() << "no breaks set. exiting";
     QCoreApplication::exit(1);
+    return;
   }
 
   setupTray();
