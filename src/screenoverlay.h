@@ -6,6 +6,7 @@ class Manager;
 
 class ScreenOverlay : public QWidget
 {
+  Q_OBJECT
 public:
   explicit ScreenOverlay(Manager &manager);
 

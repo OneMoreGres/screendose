@@ -12,6 +12,7 @@ class QAction;
 
 class Manager : public QObject
 {
+  Q_OBJECT
 public:
   explicit Manager(const QString &configName);
   ~Manager() final;
