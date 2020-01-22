@@ -4,7 +4,6 @@
 #include <memory>
 
 class QString;
-class QObject;
 class ScreenOverlay;
 class Manager;
 
@@ -19,5 +18,6 @@ public:
 
 private:
   bool isVisible_;
-  std::vector<std::unique_ptr<ScreenOverlay> > screens_;
+  Manager &manager_;
+  std::vector<std::unique_ptr<ScreenOverlay> > overlays_;
 };
