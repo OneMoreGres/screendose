@@ -44,6 +44,16 @@ int main(int argc, char *argv[])
 
   const auto cmd = parseCmdline();
 
+  const auto lockFileName =
+    QStandardPaths::writableLocation(QStandardPaths::TempLocation) +
+    QStringLiteral("/screendose.lock");
+  QLockFile lockFile(lockFileName);
+  if (!lockFile.tryLock()) {
+    qWarning() << QObject::tr(
+      "Another instance is running. Lock file is busy.");
+    return 0;
+  }
+
   Manager m(cmd.configFile);
 
   return a.exec();
