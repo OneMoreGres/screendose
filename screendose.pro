@@ -58,9 +58,13 @@ linux {
     shortcuts.files = $$ROOT/share/screendose.desktop
     shortcuts.path = $$PREFIX/share/applications/
     pixmaps.files += $$ROOT/images/screendose.png
-    pixmaps.path = $$PREFIX/share/pixmaps/
+    pixmaps.path = $$PREFIX/share/icons/hicolor/512x512/apps/
 
     INSTALLS += target shortcuts pixmaps
+}
+win32 {
+    target.path = /
+    INSTALLS += target
 }
 
 RESOURCES += \
