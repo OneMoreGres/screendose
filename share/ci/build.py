@@ -13,5 +13,5 @@ qmake_cmd = 'qmake "{}"'.format(pro_file)
 make_cmd = c.get_make_cmd()
 
 os.chdir(build_dir)
+c.run('{} && lrelease "{}"'.format(env_cmd, pro_file))
 c.run('{} && {} && {}'.format(env_cmd, qmake_cmd, make_cmd))
-os.chdir('..')

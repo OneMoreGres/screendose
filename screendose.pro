@@ -49,6 +49,10 @@ OTHER_FILES += \
     share/* \
     version
 
+TRANSLATIONS += \
+    translations/screendose_ru.ts
+
+translations.files = $$ROOT/translations/screendose_ru.qm
 
 linux {
     PREFIX = /usr
@@ -59,15 +63,19 @@ linux {
     shortcuts.path = $$PREFIX/share/applications/
     pixmaps.files += $$ROOT/images/screendose.png
     pixmaps.path = $$PREFIX/share/icons/hicolor/512x512/apps/
+    translations.path = $$PREFIX/translations
 
-    INSTALLS += target shortcuts pixmaps
+    INSTALLS += target shortcuts pixmaps translations
 }
 win32 {
     RC_ICONS = $$ROOT/images/icon.ico
+    translations.path = /translations
     target.path = /
-    INSTALLS += target
+    INSTALLS += target translations
 }
 mac {
+    translations.path = Contents/Translations
+    QMAKE_BUNDLE_DATA += translations
     ICON = $$ROOT/images/icon.icns
 }
 

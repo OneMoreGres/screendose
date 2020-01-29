@@ -42,6 +42,30 @@ int main(int argc, char *argv[])
   a.setApplicationName(QStringLiteral("Screen Dose"));
   a.setApplicationVersion(STR(VERSION_STRING));
 
+  {
+    const auto paths = QStringList{
+      QLibraryInfo::location(QLibraryInfo::TranslationsPath),
+#ifdef Q_OS_LINUX
+      qgetenv("APPDIR") + QLibraryInfo::location(QLibraryInfo::TranslationsPath), // appimage
+#endif  // ifdef Q_OS_LINUX
+      {},
+      QLatin1String("translations"),
+    };
+
+    QStringList names{QStringLiteral("qt"), QStringLiteral("screendose")};
+    auto translator = new QTranslator;
+    for (const auto &name: names) {
+      for (const auto &path : paths) {
+        if (translator->load(QLocale(), name, QStringLiteral("_"), path)) {
+          a.installTranslator(translator);
+          translator = new QTranslator;
+          break;
+        }
+      }
+    }
+    delete translator;
+  }
+
   const auto cmd = parseCmdline();
 
   const auto lockFileName =
