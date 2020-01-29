@@ -63,8 +63,12 @@ linux {
     INSTALLS += target shortcuts pixmaps
 }
 win32 {
+    RC_ICONS = $$ROOT/images/icon.ico
     target.path = /
     INSTALLS += target
+}
+mac {
+    ICON = $$ROOT/images/icon.icns
 }
 
 RESOURCES += \
