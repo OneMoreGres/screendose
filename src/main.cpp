@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
   QLockFile lockFile(lockFileName);
   if (!lockFile.tryLock()) {
     qWarning() << QObject::tr(
-      "Another instance is running. Lock file is busy.");
+      "Another instance is running. Lock file is busy.") << lockFileName;
     return 0;
   }
 
