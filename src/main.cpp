@@ -42,6 +42,8 @@ int main(int argc, char *argv[])
   a.setApplicationName(QStringLiteral("Screen Dose"));
   a.setApplicationVersion(STR(VERSION_STRING));
 
+  a.setQuitOnLastWindowClosed(false);
+
   {
     const auto paths = QStringList{
       QLibraryInfo::location(QLibraryInfo::TranslationsPath),
