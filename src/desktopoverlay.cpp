@@ -22,7 +22,7 @@ void DesktopOverlay::ensureVisible(const QString &text)
   if (screensSize > overlaysSize)
     overlays_.reserve(screensSize);
 
-  for (auto i = 0, end = screensSize; i < end; ++i) {
+  for (auto i = 0ll, end = screensSize; i < end; ++i) {
     if (i == overlaysSize) {
       overlays_.emplace_back(new ScreenOverlay(manager_));
       ++overlaysSize;

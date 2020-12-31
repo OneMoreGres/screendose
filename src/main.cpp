@@ -46,9 +46,9 @@ int main(int argc, char *argv[])
 
   {
     const auto paths = QStringList{
-      QLibraryInfo::location(QLibraryInfo::TranslationsPath),
+      QLibraryInfo::path(QLibraryInfo::TranslationsPath),
 #ifdef Q_OS_LINUX
-      qgetenv("APPDIR") + QLibraryInfo::location(QLibraryInfo::TranslationsPath), // appimage
+      qgetenv("APPDIR") + QLibraryInfo::path(QLibraryInfo::TranslationsPath), // appimage
 #endif  // ifdef Q_OS_LINUX
       {},
       QLatin1String("translations"),
