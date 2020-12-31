@@ -3,15 +3,16 @@
 #include <QDateTime>
 #include <QVector>
 
-struct Seconds
-{
-  constexpr explicit Seconds(qint64 value = 0) : value(value) {}
-  constexpr operator qint64() const {return value;}
+struct Seconds {
+  constexpr explicit Seconds(qint64 value = 0)
+    : value(value)
+  {
+  }
+  constexpr operator qint64() const { return value; }
   qint64 value;
 };
 
-struct Break
-{
+struct Break {
   Seconds interval;
   Seconds duration;
   QDateTime time;

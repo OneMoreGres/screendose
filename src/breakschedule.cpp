@@ -4,9 +4,9 @@
 
 using namespace std;
 
-BreakSchedule::BreakSchedule() :
-  origin_(QDateTime::currentDateTime()),
-  nextBreak_(nullptr)
+BreakSchedule::BreakSchedule()
+  : origin_(QDateTime::currentDateTime())
+  , nextBreak_(nullptr)
 {
 }
 
@@ -48,7 +48,7 @@ void BreakSchedule::activateAt(int row)
 void BreakSchedule::skip()
 {
   const auto now = QDateTime::currentDateTime();
-  for (auto &b: breaks_) {
+  for (auto &b : breaks_) {
     if (isActive(b))
       b.time = now.addSecs(b.interval);
   }
@@ -64,7 +64,7 @@ bool BreakSchedule::isActive(const Break &breakInfo) const
 void BreakSchedule::updateBreaks()
 {
   const auto now = QDateTime::currentDateTime();
-  for (auto &b: breaks_) {
+  for (auto &b : breaks_) {
     while (b.time.addSecs(b.duration) <= now)
       b.time = b.time.addSecs(b.duration + b.interval);
   }
@@ -78,10 +78,9 @@ const QVector<Break> &BreakSchedule::breaks() const
 void BreakSchedule::updateNext()
 {
   Q_ASSERT(!breaks_.empty());
-  auto it = std::min_element(breaks_.cbegin(), breaks_.cend(),
-                             [](const Break &l, const Break &r) {
-                               return l.time < r.time;
-                             });
+  auto it = std::min_element(
+      breaks_.cbegin(), breaks_.cend(),
+      [](const Break &l, const Break &r) { return l.time < r.time; });
   Q_ASSERT(it != breaks_.cend());
   nextBreak_ = &(*it);
 }

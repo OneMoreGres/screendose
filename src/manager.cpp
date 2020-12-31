@@ -1,10 +1,10 @@
 #include "manager.h"
 
-#include <QFile>
-#include <QTime>
 #include <QCoreApplication>
-#include <QMenu>
 #include <QDebug>
+#include <QFile>
+#include <QMenu>
+#include <QTime>
 
 QString toString(qint64 seconds)
 {
@@ -14,7 +14,8 @@ QString toString(qint64 seconds)
   seconds -= minutes * 60;
   if (hours > 0) {
     return QString::number(hours) + QLatin1Char(':') +
-           QString::number(minutes).rightJustified(2, QLatin1Char('0')) + QLatin1Char(':') +
+           QString::number(minutes).rightJustified(2, QLatin1Char('0')) +
+           QLatin1Char(':') +
            QString::number(seconds).rightJustified(2, QLatin1Char('0'));
   }
   if (minutes > 0) {
@@ -24,12 +25,12 @@ QString toString(qint64 seconds)
   return QString::number(seconds);
 }
 
-Manager::Manager(const QString &configName) :
-  warnBefore_(-1),
-  overlay_(*this),
-  trayMenu_(new QMenu),
-  tray_(new QSystemTrayIcon),
-  pauseAction_(nullptr)
+Manager::Manager(const QString &configName)
+  : warnBefore_(-1)
+  , overlay_(*this)
+  , trayMenu_(new QMenu)
+  , tray_(new QSystemTrayIcon)
+  , pauseAction_(nullptr)
 {
   readConfig(configName);
 
@@ -52,7 +53,7 @@ void Manager::skipBreak()
 
 Manager::~Manager() = default;
 
-void Manager::timerEvent(QTimerEvent */*event*/)
+void Manager::timerEvent(QTimerEvent * /*event*/)
 {
   Q_ASSERT(pauseAction_);
   if (pauseAction_->isChecked()) {
@@ -63,8 +64,7 @@ void Manager::timerEvent(QTimerEvent */*event*/)
 
   if (schedule_.isActive()) {
     overlay_.ensureVisible(toString(schedule_.breakLeft()));
-  }
-  else {
+  } else {
     overlay_.ensureHidden();
 
     QStringList toolTip{tr("Time till break:")};
@@ -73,7 +73,7 @@ void Manager::timerEvent(QTimerEvent */*event*/)
 
     const Break *nearest = nullptr;
     auto toNearest = std::numeric_limits<qint64>::max();
-    for (const auto &b: breaks) {
+    for (const auto &b : breaks) {
       const auto toBreak = now.secsTo(b.time) + 1;
       toolTip << toString(toBreak);
       if (toBreak < toNearest) {
@@ -86,7 +86,8 @@ void Manager::timerEvent(QTimerEvent */*event*/)
     if (nearest && toNearest == warnBefore_) {
       tray_->showMessage(QCoreApplication::applicationName(),
                          tr("Break in %1 seconds for %2")
-                         .arg(toNearest).arg(toString(nearest->duration)));
+                             .arg(toNearest)
+                             .arg(toString(nearest->duration)));
     }
   }
 }
@@ -100,20 +101,18 @@ void Manager::readConfig(const QString &configName)
     return;
   }
 
-
   auto parseDt = [](const QString &in) {
-                   auto parts = in.split(':');
-                   auto result = 0;
-                   if (!parts.isEmpty()) {
-                     if (parts.size() == 1) {
-                       result = parts[0].toInt();
-                     }
-                     else {
-                       result = parts[0].toInt() * 60 + parts[1].toInt();
-                     }
-                   }
-                   return Seconds(result);
-                 };
+    auto parts = in.split(':');
+    auto result = 0;
+    if (!parts.isEmpty()) {
+      if (parts.size() == 1) {
+        result = parts[0].toInt();
+      } else {
+        result = parts[0].toInt() * 60 + parts[1].toInt();
+      }
+    }
+    return Seconds(result);
+  };
 
   while (!f.atEnd()) {
     const auto line = f.readLine().trimmed();
@@ -129,16 +128,15 @@ void Manager::readConfig(const QString &configName)
         Break breakInfo;
         breakInfo.interval = Seconds(parseDt(parts[1]));
         breakInfo.duration = Seconds(parseDt(parts[2]));
-        qDebug() << "Read break with interval(duration)"
-                 << breakInfo.interval << breakInfo.duration;
+        qDebug() << "Read break with interval(duration)" << breakInfo.interval
+                 << breakInfo.duration;
         if (breakInfo.interval <= 0 || breakInfo.duration <= 0) {
           qWarning() << "Not positive values found in break. Ignoring.";
           continue;
         }
         schedule_.add(breakInfo);
       }
-    }
-    else if (name == "warn_before") {
+    } else if (name == "warn_before") {
       warnBefore_ = Seconds(parts[1].toInt());
     }
   }
@@ -148,11 +146,10 @@ void Manager::setupTray()
 {
   auto activateMenu = trayMenu_->addMenu("Activate");
   auto row = 0;
-  for (const auto &b: schedule_.breaks()) {
-    auto action = activateMenu->addAction(
-      toString(b.interval.value) + " - " + toString(b.duration.value));
-    connect(action, &QAction::triggered,
-            this, [this, row] {
+  for (const auto &b : schedule_.breaks()) {
+    auto action = activateMenu->addAction(toString(b.interval.value) + " - " +
+                                          toString(b.duration.value));
+    connect(action, &QAction::triggered, this, [this, row] {
       schedule_.activateAt(row);
       timerEvent(nullptr);
     });
@@ -163,8 +160,7 @@ void Manager::setupTray()
   pauseAction_->setCheckable(true);
 
   auto close = trayMenu_->addAction(tr("Exit"));
-  connect(close, &QAction::triggered,
-          this, [] {QCoreApplication::quit();});
+  connect(close, &QAction::triggered, this, [] { QCoreApplication::quit(); });
 
   tray_->setContextMenu(trayMenu_.get());
 

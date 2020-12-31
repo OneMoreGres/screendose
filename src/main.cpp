@@ -11,8 +11,7 @@
 #define STR2(XXX) #XXX
 #define STR(XXX) STR2(XXX)
 
-struct Cmd
-{
+struct Cmd {
   QString configFile{":/settings.ini"};
 };
 
@@ -25,8 +24,8 @@ Cmd parseCmdline()
 
   Cmd result;
   const QCommandLineOption configOption(
-    {"c", "config"}, QStringLiteral("Configuration file to use."),
-    QStringLiteral("config"), result.configFile);
+      {"c", "config"}, QStringLiteral("Configuration file to use."),
+      QStringLiteral("config"), result.configFile);
   parser.addOption(configOption);
 
   parser.process(QCoreApplication::arguments());
@@ -46,17 +45,18 @@ int main(int argc, char *argv[])
 
   {
     const auto paths = QStringList{
-      QLibraryInfo::path(QLibraryInfo::TranslationsPath),
+        QLibraryInfo::path(QLibraryInfo::TranslationsPath),
 #ifdef Q_OS_LINUX
-      qgetenv("APPDIR") + QLibraryInfo::path(QLibraryInfo::TranslationsPath), // appimage
+        qgetenv("APPDIR") +
+            QLibraryInfo::path(QLibraryInfo::TranslationsPath),  // appimage
 #endif  // ifdef Q_OS_LINUX
-      {},
-      QLatin1String("translations"),
+        {},
+        QLatin1String("translations"),
     };
 
     QStringList names{QStringLiteral("qt"), QStringLiteral("screendose")};
     auto translator = new QTranslator;
-    for (const auto &name: names) {
+    for (const auto &name : names) {
       for (const auto &path : paths) {
         if (translator->load(QLocale(), name, QStringLiteral("_"), path)) {
           a.installTranslator(translator);
@@ -71,12 +71,12 @@ int main(int argc, char *argv[])
   const auto cmd = parseCmdline();
 
   const auto lockFileName =
-    QStandardPaths::writableLocation(QStandardPaths::TempLocation) +
-    QStringLiteral("/screendose.lock");
+      QStandardPaths::writableLocation(QStandardPaths::TempLocation) +
+      QStringLiteral("/screendose.lock");
   QLockFile lockFile(lockFileName);
   if (!lockFile.tryLock()) {
-    qWarning() << QObject::tr(
-      "Another instance is running. Lock file is busy.") << lockFileName;
+    qWarning() << QObject::tr("Another instance is running. Lock file is busy.")
+               << lockFileName;
     return 0;
   }
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 class QString;
 class ScreenOverlay;
@@ -19,5 +19,5 @@ public:
 private:
   bool isVisible_;
   Manager &manager_;
-  std::vector<std::unique_ptr<ScreenOverlay> > overlays_;
+  std::vector<std::unique_ptr<ScreenOverlay>> overlays_;
 };

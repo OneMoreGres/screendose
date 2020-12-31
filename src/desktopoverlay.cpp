@@ -4,9 +4,9 @@
 #include <QGuiApplication>
 #include <QScreen>
 
-DesktopOverlay::DesktopOverlay(Manager &manager) :
-  isVisible_(false),
-  manager_(manager)
+DesktopOverlay::DesktopOverlay(Manager &manager)
+  : isVisible_(false)
+  , manager_(manager)
 {
 }
 
