@@ -8,7 +8,7 @@ with open(path.dirname(__file__) + '/../../version', 'rt') as f:
 target_name = 'screendose'
 with open(path.dirname(__file__) + '/../../version', 'rt') as f:
     app_version = f.readline().strip()
-qt_version = '5.14.0'
+qt_version = '6.0.3'
 qt_modules = ['qtbase', 'qttools', 'icu', 'qttranslations']
 qt_dir = path.abspath('qt')
 

@@ -16,17 +16,14 @@ artifact_path = os.path.abspath(artifact_name)
 
 c.print('>> Making appimage')
 
-base_url = 'https://github.com/probonopd/linuxdeployqt/releases/download'
-continuous_url = base_url + '/continuous/linuxdeployqt-continuous-x86_64.AppImage'
-tagged_url = base_url + '/6/linuxdeployqt-6-x86_64.AppImage'
-linuxdeployqt_url = tagged_url
-linuxdeployqt_original = os.path.basename(linuxdeployqt_url)
+def get_bin(url):
+    file = os.path.abspath(os.path.basename(url))
+    c.download(url, file)
+    c.run('chmod a+x {}'.format(file))
+    return file
 
-c.download(linuxdeployqt_url, linuxdeployqt_original)
-c.run('chmod a+x {}'.format(linuxdeployqt_original))
-
-linuxdeployqt_bin = os.path.abspath('linuxdeployqt')
-c.symlink(linuxdeployqt_original, linuxdeployqt_bin)
+linuxdeploy_bin = get_bin('https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage')
+get_bin('https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage')
 
 os.chdir(build_dir)
 
@@ -35,14 +32,13 @@ c.recreate_dir(install_dir)
 c.run('make INSTALL_ROOT={0} DESTDIR={0} install'.format(install_dir))
 
 if c.is_inside_docker():
-    c.run('{}  --appimage-extract'.format(linuxdeployqt_bin))
-    linuxdeployqt_bin = os.path.abspath('squashfs-root/AppRun')
+    c.run('{}  --appimage-extract'.format(linuxdeploy_bin))
+    linuxdeploy_bin = os.path.abspath('squashfs-root/AppRun')
 
 os.environ['VERSION'] = app_version
-# debug flags: -unsupported-bundle-everything -unsupported-allow-new-glibc
-flags = '' if os.getenv("DEBUG") is None else '-unsupported-allow-new-glibc'
+os.environ['QMAKE'] = os.path.abspath(qt_dir + '/bin/qmake') # for icu internal dependency
 
-c.run('{} {}/usr/share/applications/*.desktop {} -appimage -qmake={}/bin/qmake'.format(
-    linuxdeployqt_bin, install_dir, flags, qt_dir))
+c.run('{} --appdir {} -d {}/usr/share/applications/*.desktop --plugin qt --output appimage'.format(
+    linuxdeploy_bin, install_dir, install_dir))
 
 c.run('mv {}-{}*.AppImage "{}"'.format(app_name, app_version, artifact_path))
