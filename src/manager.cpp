@@ -144,7 +144,7 @@ void Manager::readConfig(const QString &configName)
 
 void Manager::setupTray()
 {
-  auto activateMenu = trayMenu_->addMenu("Activate");
+  auto activateMenu = trayMenu_->addMenu(tr("Activate"));
   auto row = 0;
   for (const auto &b : schedule_.breaks()) {
     auto action = activateMenu->addAction(toString(b.interval.value) + " - " +

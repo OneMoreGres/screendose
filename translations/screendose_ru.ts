@@ -14,6 +14,11 @@
         <translation>Перерыв в течение %1 сек. на %2</translation>
     </message>
     <message>
+        <location filename="../src/manager.cpp" line="147"/>
+        <source>Activate</source>
+        <translation>Активировать</translation>
+    </message>
+    <message>
         <location filename="../src/manager.cpp" line="162"/>
         <source>Pause</source>
         <translation>Пауза</translation>
