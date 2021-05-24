@@ -41,7 +41,9 @@ void DesktopOverlay::ensureVisible(const QString &text)
 
 void DesktopOverlay::ensureHidden()
 {
-  for (const auto &overlay: overlays_)
-    overlay->hide();
+  for (const auto &overlay : overlays_) {
+    if (overlay->isVisible())
+      overlay->hide();
+  }
   isVisible_ = false;
 }

@@ -10,7 +10,7 @@
 
 class QAction;
 
-class Manager : public QObject
+class Manager final : public QObject
 {
   Q_OBJECT
 public:

@@ -9,7 +9,7 @@ ScreenOverlay::ScreenOverlay(Manager &manager)
   : manager_(manager)
   , label_(new QLabel(this))
 {
-  setWindowFlags(Qt::WindowStaysOnTopHint | Qt::MaximizeUsingFullscreenGeometryHint);
+  setWindowFlags(Qt::WindowStaysOnTopHint);
 
   auto vbox = new QVBoxLayout;
   auto hbox = new QHBoxLayout;

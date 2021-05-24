@@ -19,12 +19,12 @@
         <translation>Активировать</translation>
     </message>
     <message>
-        <location filename="../src/manager.cpp" line="162"/>
+        <location filename="../src/manager.cpp" line="159"/>
         <source>Pause</source>
         <translation>Пауза</translation>
     </message>
     <message>
-        <location filename="../src/manager.cpp" line="165"/>
+        <location filename="../src/manager.cpp" line="162"/>
         <source>Exit</source>
         <translation>Выход</translation>
     </message>
@@ -32,12 +32,12 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/main.cpp" line="22"/>
+        <location filename="../src/main.cpp" line="21"/>
         <source>Screen time limiter tool</source>
         <translation>Ограничитель работы с экраном</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="82"/>
+        <location filename="../src/main.cpp" line="78"/>
         <source>Another instance is running. Lock file is busy.</source>
         <translation>Уже запущен другой экземпляр программы. Файл блокировки занят.</translation>
     </message>
@@ -45,7 +45,7 @@
 <context>
     <name>ScreenOverlay</name>
     <message>
-        <location filename="../src/screenoverlay.cpp" line="19"/>
+        <location filename="../src/screenoverlay.cpp" line="17"/>
         <source>S - skip</source>
         <translation>S - пропустить</translation>
     </message>
