@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QMenu>
 #include <QTime>
+#include <QTimer>
 
 QString toString(qint64 seconds)
 {
@@ -48,7 +49,7 @@ Manager::Manager(const QString &configName)
 void Manager::skipBreak()
 {
   schedule_.skip();
-  overlay_.ensureHidden();
+  QTimer::singleShot(200, this, [this]{overlay_.ensureHidden();});
 }
 
 Manager::~Manager() = default;
