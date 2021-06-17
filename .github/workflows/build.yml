@@ -6,7 +6,7 @@ jobs:
   release:
     name: Create release
     if: contains(github.ref, '/tags/')
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Create release
         id: create_release
@@ -38,8 +38,7 @@ jobs:
       matrix:
         config:
           - { name: "win64", os: windows-latest }
-          - { name: "win32", os: windows-latest }
-          - { name: "linux", os: ubuntu-16.04 }
+          - { name: "linux", os: ubuntu-20.04 }
           - { name: "macos", os: macos-latest }
     steps:
       - uses: actions/checkout@v2
@@ -53,7 +52,7 @@ jobs:
 
       - name: Install system libs
         if: runner.os == 'Linux'
-        run: sudo apt install libgl1-mesa-dev libxkbcommon-x11-0
+        run: sudo apt install libgl1-mesa-dev libxkbcommon-x11-0 libxcb-*
 
       - name: Get Qt
         run: python ./share/ci/get_qt.py
@@ -66,21 +65,21 @@ jobs:
         shell: bash
         run: |
           python ./share/ci/appimage.py
-          echo ::set-env name=artifact::`python ./share/ci/appimage.py artifact_name`
+          echo "artifact=`python ./share/ci/appimage.py artifact_name`" >> $GITHUB_ENV
 
       - name: Create win deploy
         if: runner.os == 'Windows'
         shell: bash
         run: |
           python ./share/ci/windeploy.py
-          echo ::set-env name=artifact::`python ./share/ci/windeploy.py artifact_name`
+          echo "artifact=`python ./share/ci/windeploy.py artifact_name`" >> $GITHUB_ENV
 
       - name: Create mac deploy
         if: runner.os == 'macOS'
         shell: bash
         run: |
           python ./share/ci/macdeploy.py
-          echo ::set-env name=artifact::`python ./share/ci/macdeploy.py artifact_name`
+          echo "artifact=`python ./share/ci/macdeploy.py artifact_name`" >> $GITHUB_ENV
 
       - name: Upload build artifact
         if: env.artifact != ''
@@ -99,7 +98,7 @@ jobs:
       - name: Set release env
         if: contains(github.ref, '/tags/')
         shell: bash
-        run: echo ::set-env name=upload_url::`cat ./release_upload_url`
+        run: echo "upload_url=`cat ./release_upload_url`" >> $GITHUB_ENV
 
       - name: Upload release artifacts
         if: contains(github.ref, '/tags/')
