@@ -49,7 +49,7 @@ Manager::Manager(const QString &configName)
 void Manager::skipBreak()
 {
   schedule_.skip();
-  QTimer::singleShot(200, this, [this]{overlay_.ensureHidden();});
+  QTimer::singleShot(200, this, [this] { overlay_.ensureHidden(); });
 }
 
 Manager::~Manager() = default;
@@ -57,11 +57,17 @@ Manager::~Manager() = default;
 void Manager::timerEvent(QTimerEvent * /*event*/)
 {
   Q_ASSERT(pauseAction_);
+  if (pauseFor_ > 0)  // TODO check call time deltas, not 1sec
+    pauseFor_ = Seconds(int(pauseFor_) - 1);
+  if (pauseFor_ == 0)
+    pauseAction_->setChecked(false);
+
   if (pauseAction_->isChecked()) {
     overlay_.ensureHidden();
     tray_->setToolTip({});
     return;
   }
+  pauseFor_ = Seconds(0);
 
   if (schedule_.isActive()) {
     overlay_.ensureVisible(toString(schedule_.breakLeft()));
@@ -159,6 +165,19 @@ void Manager::setupTray()
 
   pauseAction_ = trayMenu_->addAction(tr("Pause"));
   pauseAction_->setCheckable(true);
+  connect(pauseAction_, &QAction::triggered, this,
+          [this] { pauseFor_ = Seconds(-1); });
+
+  auto pauseMenu = trayMenu_->addMenu(tr("Pause for..."));
+  for (const auto mins : QVector<int>{1, 60, 120, 240}) {
+    const auto secs = Seconds(mins * 60);
+    auto action = pauseMenu->addAction(toString(secs));
+    connect(action, &QAction::triggered, this, [this, secs] {
+      pauseAction_->setChecked(true);
+      pauseFor_ = secs;
+      timerEvent(nullptr);
+    });
+  }
 
   auto close = trayMenu_->addAction(tr("Exit"));
   connect(close, &QAction::triggered, this, [] { QCoreApplication::quit(); });

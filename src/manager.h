@@ -27,6 +27,7 @@ private:
   void setupTray();
 
   Seconds warnBefore_;
+  Seconds pauseFor_;
   BreakSchedule schedule_;
   DesktopOverlay overlay_;
   std::unique_ptr<QMenu> trayMenu_;
