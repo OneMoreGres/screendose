@@ -8,6 +8,9 @@ import functools
 import shutil
 import multiprocessing
 import platform
+import re
+import ast
+import hashlib
 
 
 print = functools.partial(print, flush=True)
@@ -123,32 +126,48 @@ def add_to_path(entry, prepend=True):
     os.environ['PATH'] = entry + path_separator + os.environ['PATH']
 
 
-def get_cpp_env_cmd(bitness='64', msvc_version=''):
-    """Return environment setup command for running cpp compiler for current platform"""
+def get_msvc_env_cmd(bitness='64', msvc_version=''):
+    """Return environment setup command for running msvc compiler for current platform"""
     if platform.system() != "Windows":
-        return 'true'
+        return None
 
-    msvc_path = 'C:/Program Files (x86)/Microsoft Visual Studio'
-    if len(msvc_version) == 0:
-        with os.scandir(msvc_path) as ver_it:
-            version = next(ver_it, '')
-            with os.scandir(msvc_path + '/' + version) as ed_it:
-                msvc_version = version + '/' + next(ed_it, '')
-
-    env_script = msvc_path + '/{}/VC/Auxiliary/Build/vcvars{}.bat'.format(
-        msvc_version, bitness)
+    env_script = msvc_version + '/VC/Auxiliary/Build/vcvars{}.bat'.format(bitness)
     return '"' + env_script + '"'
 
 
 def get_make_cmd():
     """Return `make` command for current platform"""
+    return 'nmake' if platform.system() == "Windows" else 'make'
+
+
+def set_make_threaded():
+    """Adjust environment to run threaded make command"""
     if platform.system() == "Windows":
         os.environ['CL'] = '/MP'
-        return 'nmake'
-    return 'make -j{}'.format(multiprocessing.cpu_count())
+    else:
+        os.environ['MAKEFLAGS'] = '-j{}'.format(multiprocessing.cpu_count())
 
 
 def is_inside_docker():
     """ Return True if running in a Docker container """
     with open('/proc/1/cgroup', 'rt') as f:
         return 'docker' in f.read()
+
+def apply_cmd_env(cmd):
+    """Run cmd and apply its modified environment"""
+    print('>> Applying env after', cmd)
+    separator = 'env follows'
+    script = 'import os,sys;sys.stdout.buffer.write(str(dict(os.environ)).encode(\\\"utf-8\\\"))'
+    env = sub.run('{} && echo "{}" && python -c "{}"'.format(cmd, separator, script),
+                  shell=True, stdout=sub.PIPE, encoding='utf-8')
+
+    stringed = env.stdout[env.stdout.index(separator) + len(separator) + 1:]
+    parsed = ast.literal_eval(stringed)
+
+    for key, value in parsed.items():
+        if key in os.environ and os.environ[key] == value:
+            continue
+        if key in os.environ:
+            print('>>> Changing env', key, '\nfrom\n',
+                  os.environ[key], '\nto\n', value)
+        os.environ[key] = value

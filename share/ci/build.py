@@ -1,17 +1,27 @@
 import common as c
 from config import *
 import os
+import platform
 
 c.print('>> Building {} on {}'.format(app_name, os_name))
 
 c.add_to_path(os.path.abspath(qt_dir + '/bin'))
 os.environ['VERSION'] = app_version
+
+if platform.system() == "Windows":
+    env_cmd = c.get_msvc_env_cmd(bitness=bitness, msvc_version=msvc_version)
+    c.apply_cmd_env(env_cmd)
+
 c.recreate_dir(build_dir)
-
-env_cmd = c.get_cpp_env_cmd(bitness=bitness, msvc_version=msvc_version)
-qmake_cmd = 'qmake "{}"'.format(pro_file)
-make_cmd = c.get_make_cmd()
-
 os.chdir(build_dir)
-c.run('{} && lrelease "{}"'.format(env_cmd, pro_file))
-c.run('{} && {} && {}'.format(env_cmd, qmake_cmd, make_cmd))
+
+c.run('lupdate "{}"'.format(pro_file))
+c.run('lrelease "{}"'.format(pro_file))
+
+c.set_make_threaded()
+build_type_flag = 'debug' if build_type == 'debug' else 'release'
+qmake_flags = os.environ.get('QMAKE_FLAGS','') + ' CONFIG+=' + build_type_flag
+c.run('qmake {} "{}"'.format(qmake_flags, pro_file))
+make_cmd = c.get_make_cmd()
+c.run(make_cmd)
+
